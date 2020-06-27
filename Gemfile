@@ -8,6 +8,7 @@ ruby '2.6.1'
 gem "sidekiq"
 gem "foreman"
 gem "nokogiri"
+gem "pdf-reader"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.4', '>= 5.2.4.3'
