@@ -4,14 +4,21 @@ require "sense/client"
 require "xcel/client"
 
 class RunWorkflow
-  def initialize(sense_email:, sense_password:, xcel_email:, xcel_password:)
+  def initialize(
+    sense_email:,
+    sense_password:,
+    xcel_username:,
+    xcel_password:,
+    xcel_account_id:
+  )
     @sense_client = Sense::Client.new
     @sense_email = sense_email
     @sense_password = sense_password
 
     @xcel_client = Xcel::Client.new
-    @xcel_email = @xcel_email
+    @xcel_username = xcel_username
     @xcel_password = xcel_password
+    @xcel_account_id = xcel_account_id
   end
 
   def call
@@ -35,13 +42,18 @@ class RunWorkflow
     :sense_client,
     :sense_email,
     :sense_password,
+    :xcel_account_id,
     :xcel_client,
-    :xcel_email,
-    :xcel_password
+    :xcel_password,
+    :xcel_username
   )
 
   def login_to_xcel
-    xcel_client.login(email: xcel_email, password: xcel_password)
+    xcel_client.login(
+      username: xcel_username,
+      password: xcel_password,
+      account_id: xcel_account_id
+    )
   end
 
   def fetch_bill
@@ -73,4 +85,10 @@ class RunWorkflow
   end
 end
 
-RunWorkflow.new(sense_email: ENV.fetch("SENSE_EMAIL"), sense_password: ENV.fetch("SENSE_PASSWORD")).call
+RunWorkflow.new(
+  sense_email: ENV.fetch("SENSE_EMAIL"),
+  sense_password: ENV.fetch("SENSE_PASSWORD"),
+  xcel_username: ENV.fetch("XCEL_USERNAME"),
+  xcel_password: ENV.fetch("XCEL_PASSWORD"),
+  xcel_account_id: ENV.fetch("XCEL_ACCOUNT_ID")
+).call
