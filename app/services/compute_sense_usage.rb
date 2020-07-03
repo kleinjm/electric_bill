@@ -8,13 +8,10 @@ class ComputeSenseUsage
   end
 
   def call
-    # shift to remove first row
-    csv = response_body.split("\r")
-    csv.shift
-    csv.map!(&:strip)
-    csv.reject!(&:blank?)
+    csv_data = format_csv_data
+    parsed_csv = CSV.parse(csv_data, headers: true)
 
-    parsed_csv = CSV.parse(csv.join("\n"), headers: true)
+    validate_data_exists!(parsed_csv: parsed_csv)
 
     parsed_csv.inject(0) do |res, row|
       res += row["kWh"].to_f
@@ -24,4 +21,19 @@ class ComputeSenseUsage
   private
 
   attr_reader :response_body
+
+  def format_csv_data
+    # shift to remove first row
+    csv = response_body.split("\r")
+    csv.shift
+    csv.map!(&:strip)
+    csv.reject!(&:blank?)
+    csv.join("\n")
+  end
+
+  def validate_data_exists!(parsed_csv:)
+    return true if parsed_csv.count.positive?
+
+    raise HandledError, "Sense usage CSV has no data"
+  end
 end
