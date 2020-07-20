@@ -35,7 +35,7 @@ class RunWorkflow
 
     usage_total = compute_usage_cost(kwh_used: total_kwh, kwh_cost: kwh_cost)
 
-    # Cozy flow to bill tenants
+    # TODO: Cozy flow to bill tenants
     logger.info("Workflow completed successfully!")
   rescue HandledError => e
     logger.error(e.inspect)

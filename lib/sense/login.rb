@@ -19,7 +19,10 @@ module Sense
       body = JSON.parse(response.body)
       raise "Unauthorized" unless body["authorized"]
 
-      body["access_token"]
+      {
+        auth_token: body["access_token"],
+        monitor_id: body.dig("monitors", 0, "id")
+      }
     end
 
     private
