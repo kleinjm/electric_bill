@@ -1,0 +1,14 @@
+current directory: /Users/jklein/GitHubRepos/electric_bill/vendor/bundle/ruby/2.6.0/gems/interception-0.5/ext
+/Users/jklein/.rbenv/versions/2.6.1/bin/ruby -I /Users/jklein/.rbenv/versions/2.6.1/lib/ruby/2.6.0 -r ./siteconf20200722-6756-fzdpew.rb extconf.rb
+
+current directory: /Users/jklein/GitHubRepos/electric_bill/vendor/bundle/ruby/2.6.0/gems/interception-0.5/ext
+make "DESTDIR=" clean
+make: *** No rule to make target `clean'.  Stop.
+
+current directory: /Users/jklein/GitHubRepos/electric_bill/vendor/bundle/ruby/2.6.0/gems/interception-0.5/ext
+make "DESTDIR="
+:
+
+current directory: /Users/jklein/GitHubRepos/electric_bill/vendor/bundle/ruby/2.6.0/gems/interception-0.5/ext
+make "DESTDIR=" install
+:

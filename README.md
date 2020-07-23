@@ -1,24 +1,15 @@
-# README
+# Uploading to AWS Lambda
+## Functions
+Zip function
+`zip -j lambda/function.zip lambda/lambda_function.rb`
+Then upload with
+`aws lambda update-function-code --function-name xcel-bill-parser --zip-file fileb://lambda/function.zip`
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Layers
+After making a change to the libs, update the lambda layer. Zip the files with the following
+`zip library.zip lib/**/*`
+`aws lambda publish-layer-version --layer-name library --zip-file fileb://library.zip`
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+After updating gems
+`zip -r gems.zip vendor`
+`aws lambda publish-layer-version --layer-name gems --zip-file fileb://gems.zip`

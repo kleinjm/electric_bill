@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "xcel/download_latest_bill"
-require "xcel/login"
+require_relative "./download_latest_bill"
+require_relative "./login"
 
 module Xcel
   class Client

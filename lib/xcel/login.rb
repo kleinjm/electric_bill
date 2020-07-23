@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
+puts "LOADING MECHANIZE"
 require "mechanize"
+puts "MECHANIZE LOADED"
 
 module Xcel
   class Login
