@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Load gems
-load_paths = Dir["/opt/vendor/bundle/ruby/2.6.0/gems/**/lib"]
+load_paths = Dir["/opt/vendor/bundle/ruby/2.7.0/gems/**/lib"]
 $LOAD_PATH.unshift(*load_paths)
 
 # Load custom library code
