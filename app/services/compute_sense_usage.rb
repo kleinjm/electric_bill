@@ -9,11 +9,15 @@ class ComputeSenseUsage
 
   def call
     csv_data = format_csv_data
+    File.write("tmp/sense_usage.csv", csv_data)
     parsed_csv = CSV.parse(csv_data, headers: true)
 
     validate_data_exists!(parsed_csv: parsed_csv)
 
     parsed_csv.inject(0) do |res, row|
+      next res unless row["Name"] == "Total Usage" # only care about the total usage
+      validate_row_data!(row: row)
+
       res += row["kWh"].to_f
     end
   end
@@ -29,6 +33,10 @@ class ComputeSenseUsage
     csv.map!(&:strip)
     csv.reject!(&:blank?)
     csv.join("\n")
+  end
+
+  def validate_row_data!(row:)
+    raise "Missing kwh value for row: #{row}" unless row["kWh"].present?
   end
 
   def validate_data_exists!(parsed_csv:)

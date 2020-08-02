@@ -71,7 +71,7 @@ class RunWorkflow
 
   def compute_kwh_cost(bill_path:)
     logger.info("Computing kwh cost")
-    kwh_cost = ComputeKwhCost.new(bill_path: bill_path).call
+    kwh_cost = ComputeKwhCost.new(bill_path: bill_path, logger: logger).call
 
     logger.info("kWh cost: $#{kwh_cost}")
     kwh_cost
@@ -95,7 +95,7 @@ class RunWorkflow
   def compute_usage_cost(kwh_used:, kwh_cost:)
     logger.info("Computing total usage cost")
     logger.info("kWh used: #{kwh_used}")
-    total_cost = kwh_used * kwh_cost
+    total_cost = (kwh_used * kwh_cost).round(2)
 
     logger.info("Total cost: #{total_cost}")
     total_cost
