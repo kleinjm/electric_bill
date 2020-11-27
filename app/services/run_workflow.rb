@@ -25,18 +25,18 @@ class RunWorkflow
 
   def call
     login_to_xcel
-    bill_path = download_latest_bill
-    start_date, end_date = parse_bill_date_range(bill_path: bill_path)
-    kwh_cost = compute_kwh_cost(bill_path: bill_path)
-
-    login_to_sense
-    response_body = download_sense_usage(start_date: start_date, end_date: end_date)
-    total_kwh = compute_usage(response_body: response_body)
-
-    usage_total = compute_usage_cost(kwh_used: total_kwh, kwh_cost: kwh_cost)
-
-    # TODO: Cozy flow to bill tenants
-    logger.info("Workflow completed successfully!")
+    # bill_path = download_latest_bill
+    # start_date, end_date = parse_bill_date_range(bill_path: bill_path)
+    # kwh_cost = compute_kwh_cost(bill_path: bill_path)
+    #
+    # login_to_sense
+    # response_body = download_sense_usage(start_date: start_date, end_date: end_date)
+    # total_kwh = compute_usage(response_body: response_body)
+    #
+    # usage_total = compute_usage_cost(kwh_used: total_kwh, kwh_cost: kwh_cost)
+    #
+    # # TODO: Cozy flow to bill tenants
+    # logger.info("Workflow completed successfully!")
   rescue HandledError => e
     logger.error(e.inspect)
   end
@@ -60,8 +60,9 @@ class RunWorkflow
   end
 
   def download_latest_bill
-    logger.info("Downloading latest Xcel bill")
-    xcel_client.download_latest_bill(account_id: xcel_account_id)
+    # logger.info("Downloading latest Xcel bill")
+    # xcel_client.download_latest_bill(account_id: xcel_account_id)
+    Rails.root.join("tmp/latest_bill.pdf")
   end
 
   def parse_bill_date_range(bill_path:)

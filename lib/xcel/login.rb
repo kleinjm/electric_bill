@@ -11,7 +11,13 @@ module Xcel
     end
 
     def call
-      login_page = agent.get("https://myaccount.xcelenergy.com/oam/index.jsp")
+      require 'watir'
+      require 'webdrivers'
+      browser = Watir::Browser.new
+      browser.goto 'https://my.xcelenergy.com/MyAccount/XE_Login?template=XE_MA_Template'
+
+      # login_page = agent.get("https://my.xcelenergy.com/MyAccount/XE_Login?template=XE_MA_Template")
+      require "pry"; binding.pry
       form = login_page.form("loginForm")
       form.j_username = username
       form.j_password = password
