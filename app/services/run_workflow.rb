@@ -24,19 +24,19 @@ class RunWorkflow
   end
 
   def call
-    login_to_xcel
-    # bill_path = download_latest_bill
-    # start_date, end_date = parse_bill_date_range(bill_path: bill_path)
-    # kwh_cost = compute_kwh_cost(bill_path: bill_path)
-    #
-    # login_to_sense
-    # response_body = download_sense_usage(start_date: start_date, end_date: end_date)
-    # total_kwh = compute_usage(response_body: response_body)
-    #
-    # usage_total = compute_usage_cost(kwh_used: total_kwh, kwh_cost: kwh_cost)
-    #
-    # # TODO: Cozy flow to bill tenants
-    # logger.info("Workflow completed successfully!")
+    # login_to_xcel
+    bill_path = download_latest_bill
+    start_date, end_date = parse_bill_date_range(bill_path: bill_path)
+    kwh_cost = compute_kwh_cost(bill_path: bill_path)
+
+    login_to_sense
+    response_body = download_sense_usage(start_date: start_date, end_date: end_date)
+    total_kwh = compute_usage(response_body: response_body)
+
+    usage_total = compute_usage_cost(kwh_used: total_kwh, kwh_cost: kwh_cost)
+
+    # TODO: Cozy flow to bill tenants
+    logger.info("Workflow completed successfully!")
   rescue HandledError => e
     logger.error(e.inspect)
   end
@@ -108,5 +108,5 @@ RunWorkflow.new(
   sense_password: ENV.fetch("SENSE_PASSWORD"),
   xcel_username: ENV.fetch("XCEL_USERNAME"),
   xcel_password: ENV.fetch("XCEL_PASSWORD"),
-  xcel_account_id: ENV.fetch("XCEL_ACCOUNT_ID")
+  xcel_account_id: "123"
 ).call
