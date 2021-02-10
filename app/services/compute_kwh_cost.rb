@@ -1,17 +1,13 @@
 # frozen_string_literal: true
 
-require "pdf-reader"
-
 class ComputeKwhCost
-  def initialize(bill_path:, logger: Rails.logger)
-    @bill_path = bill_path
+  def initialize(bill_text:, logger: Rails.logger)
+    @bill_text = bill_text
     @logger = logger
   end
 
   def call
-    reader = PDF::Reader.new(bill_path)
-
-    stats_row = reader.pages.first.text.split("\n").select do |row|
+    stats_row = bill_text.select do |row|
       row.match?(/Electricity Service/)
     end.first
 
@@ -25,5 +21,5 @@ class ComputeKwhCost
 
   private
 
-  attr_reader :bill_path, :logger
+  attr_reader :bill_text, :logger
 end

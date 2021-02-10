@@ -8,7 +8,6 @@ ruby '2.7.0'
 gem "foreman"
 gem "mechanize"
 gem "nokogiri"
-gem "pdf-reader"
 gem "sidekiq"
 gem "watir"
 gem "webdrivers"

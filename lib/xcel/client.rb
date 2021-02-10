@@ -12,10 +12,10 @@ module Xcel
       self
     end
 
-    def download_latest_bill(account_id:)
+    def download_latest_bill
       raise "Not logged into Xcel" if browser.blank?
 
-      Xcel::DownloadLatestBill.new(account_id: account_id, browser: browser).call
+      Xcel::DownloadLatestBill.new(browser: browser).call
     end
 
     private

@@ -5,35 +5,37 @@ require "xcel/client"
 
 class RunWorkflow
   def initialize(
-    sense_email:,
+    main_sense_email:,
+    basement_sense_email:,
     sense_password:,
     xcel_username:,
-    xcel_password:,
-    xcel_account_id:
+    xcel_password:
   )
     @sense_client = Sense::Client.new
-    @sense_email = sense_email
+    @main_sense_email = main_sense_email
+    @basement_sense_email = basement_sense_email
     @sense_password = sense_password
 
     @xcel_client = Xcel::Client.new
     @xcel_username = xcel_username
     @xcel_password = xcel_password
-    @xcel_account_id = xcel_account_id
 
     @logger = Logger.new(STDOUT)
   end
 
   def call
     login_to_xcel
-    bill_path = download_latest_bill
-    start_date, end_date = parse_bill_date_range(bill_path: bill_path)
-    kwh_cost = compute_kwh_cost(bill_path: bill_path)
+    bill_text = download_latest_bill
+    start_date, end_date = parse_bill_date_range(bill_text: bill_text)
+    kwh_cost = compute_kwh_cost(bill_text: bill_text)
 
-    login_to_sense
-    response_body = download_sense_usage(start_date: start_date, end_date: end_date)
-    total_kwh = compute_usage(response_body: response_body)
+    [main_sense_email, basement_sense_email].each do |email|
+      login_to_sense(email: email)
+      response_body = download_sense_usage(start_date: start_date, end_date: end_date)
+      total_kwh = compute_usage(response_body: response_body)
 
-    usage_total = compute_usage_cost(kwh_used: total_kwh, kwh_cost: kwh_cost)
+      usage_total = compute_usage_cost(kwh_used: total_kwh, kwh_cost: kwh_cost)
+    end
 
     # TODO: Cozy flow to bill tenants
     logger.info("Workflow completed successfully!")
@@ -46,9 +48,9 @@ class RunWorkflow
   attr_reader(
     :logger,
     :sense_client,
-    :sense_email,
+    :basement_sense_email,
+    :main_sense_email,
     :sense_password,
-    :xcel_account_id,
     :xcel_client,
     :xcel_password,
     :xcel_username
@@ -61,26 +63,25 @@ class RunWorkflow
 
   def download_latest_bill
     logger.info("Downloading latest Xcel bill")
-    xcel_client.download_latest_bill(account_id: xcel_account_id)
-    # Rails.root.join("tmp/latest_bill.pdf")
+    xcel_client.download_latest_bill
   end
 
-  def parse_bill_date_range(bill_path:)
+  def parse_bill_date_range(bill_text:)
     logger.info("Parsing bill date range")
-    ParseBillDateRange.new(bill_path: bill_path).call
+    ParseBillDateRange.new(bill_text: bill_text).call
   end
 
-  def compute_kwh_cost(bill_path:)
+  def compute_kwh_cost(bill_text:)
     logger.info("Computing kwh cost")
-    kwh_cost = ComputeKwhCost.new(bill_path: bill_path, logger: logger).call
+    kwh_cost = ComputeKwhCost.new(bill_text: bill_text, logger: logger).call
 
     logger.info("kWh cost: $#{kwh_cost}")
     kwh_cost
   end
 
-  def login_to_sense
-    logger.info("Logging into Sense")
-    sense_client.login(email: sense_email, password: sense_password)
+  def login_to_sense(email:)
+    logger.info("Logging into Sense for #{email}")
+    sense_client.login(email: email, password: sense_password)
   end
 
   def download_sense_usage(start_date:, end_date:)
@@ -104,9 +105,9 @@ class RunWorkflow
 end
 
 RunWorkflow.new(
-  sense_email: ENV.fetch("SENSE_EMAIL"),
+  main_sense_email: ENV.fetch("MAIN_SENSE_EMAIL"),
+  basement_sense_email: ENV.fetch("BASEMENT_SENSE_EMAIL"),
   sense_password: ENV.fetch("SENSE_PASSWORD"),
   xcel_username: ENV.fetch("XCEL_USERNAME"),
-  xcel_password: ENV.fetch("XCEL_PASSWORD"),
-  xcel_account_id: "no-op"
+  xcel_password: ENV.fetch("XCEL_PASSWORD")
 ).call

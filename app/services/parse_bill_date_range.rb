@@ -1,16 +1,12 @@
 # frozen_string_literal: true
 
-require "pdf-reader"
-
 class ParseBillDateRange
-  def initialize(bill_path:)
-    @bill_path = bill_path
+  def initialize(bill_text:)
+    @bill_text = bill_text
   end
 
   def call
-    reader = PDF::Reader.new(bill_path)
-
-    stats_row = reader.pages.first.text.split("\n").select do |row|
+    stats_row = bill_text.select do |row|
       row.match?(/Electricity Service/)
     end.first
 
@@ -21,7 +17,7 @@ class ParseBillDateRange
 
   private
 
-  attr_reader :bill_path
+  attr_reader :bill_text
 
   DATE_FORMAT = "%m/%d/%y"
   private_constant :DATE_FORMAT
