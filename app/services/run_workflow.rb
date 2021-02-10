@@ -62,6 +62,7 @@ class RunWorkflow
   def download_latest_bill
     logger.info("Downloading latest Xcel bill")
     xcel_client.download_latest_bill(account_id: xcel_account_id)
+    # Rails.root.join("tmp/latest_bill.pdf")
   end
 
   def parse_bill_date_range(bill_path:)
@@ -107,5 +108,5 @@ RunWorkflow.new(
   sense_password: ENV.fetch("SENSE_PASSWORD"),
   xcel_username: ENV.fetch("XCEL_USERNAME"),
   xcel_password: ENV.fetch("XCEL_PASSWORD"),
-  xcel_account_id: ENV.fetch("XCEL_ACCOUNT_ID")
+  xcel_account_id: "no-op"
 ).call

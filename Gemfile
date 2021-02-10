@@ -5,11 +5,13 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.7.0'
 
-gem "sidekiq"
 gem "foreman"
+gem "mechanize"
 gem "nokogiri"
 gem "pdf-reader"
-gem "mechanize"
+gem "sidekiq"
+gem "watir"
+gem "webdrivers"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.4', '>= 5.2.4.3'

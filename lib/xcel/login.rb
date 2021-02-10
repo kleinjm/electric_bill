@@ -1,27 +1,24 @@
 # frozen_string_literal: true
 
-require "mechanize"
+require "watir"
 
 module Xcel
   class Login
     def initialize(username:, password:)
-      @agent = Mechanize.new
       @username = username
       @password = password
     end
 
     def call
-      login_page = agent.get("https://myaccount.xcelenergy.com/oam/index.jsp")
-      form = login_page.form("loginForm")
-      form.j_username = username
-      form.j_password = password
-
-      agent.submit(form, form.buttons.first)
-      agent
+      browser = Watir::Browser.start("https://my.xcelenergy.com/MyAccount/XE_Login?template=XE_MA_Template")
+      browser.text_field(id: "gigya-loginID-18682410354408050").set(username)
+      browser.text_field(id: "gigya-password-77105095086979630").set(password)
+      browser.input(value: "Sign In").click
+      browser
     end
 
     private
 
-    attr_reader :username, :password, :agent
+    attr_reader :username, :password
   end
 end

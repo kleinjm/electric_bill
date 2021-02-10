@@ -6,20 +6,20 @@ require_relative "./login"
 module Xcel
   class Client
     def login(username:, password:)
-      @agent = Xcel::Login.new(
+      @browser = Xcel::Login.new(
         username: username, password: password
       ).call
       self
     end
 
     def download_latest_bill(account_id:)
-      raise "Not logged into Xcel" if agent.blank?
+      raise "Not logged into Xcel" if browser.blank?
 
-      Xcel::DownloadLatestBill.new(account_id: account_id, agent: agent).call
+      Xcel::DownloadLatestBill.new(account_id: account_id, browser: browser).call
     end
 
     private
 
-    attr_reader :agent
+    attr_reader :browser
   end
 end

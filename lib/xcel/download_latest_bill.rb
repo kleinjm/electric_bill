@@ -3,16 +3,19 @@
 module Xcel
   class DownloadLatestBill
     class LocalDownloader
-      def initialize(pdf_url:, agent:)
+      def initialize(pdf_url:, browser:)
         @pdf_url = pdf_url
-        @agent = agent
+        @browser = browser
       end
 
       def call
         pdf_file_path = Rails.root.join("tmp/latest_bill.pdf")
 
+        # TODO: get the browser download working
+        require "pry"; binding.pry
+
         File.open(pdf_file_path, 'wb') do |file|
-          file << agent.get(pdf_url).body
+          file << browser.goto(pdf_url)
         end
 
         pdf_file_path
@@ -20,52 +23,28 @@ module Xcel
 
       private
 
-      attr_reader :pdf_url, :agent
+      attr_reader :pdf_url, :browser
     end
 
-    def initialize(account_id:, agent:, downloader: LocalDownloader)
+    def initialize(account_id:, browser:, downloader: LocalDownloader)
       @account_id = account_id
-      @agent = agent
+      @browser = browser
       @downloader = downloader
     end
 
     def call
-      bills_list_json = fetch_bill_list
-
-      latest_statement = bills_list_json.dig("statements", 0)
-      bill_number = latest_statement["billNumber"]
-      date = Date.parse(latest_statement["date"]).strftime("%Y-%m-%d")
-
-      pdf_path = fetch_pdf_link(date: date, bill_number: bill_number)
-
-      download_pdf(pdf_path: pdf_path)
+      downloader.new(pdf_url: pdf_path, browser: browser).call
     end
 
     private
 
-    attr_reader :account_id, :agent, :downloader
+    attr_reader :account_id, :browser, :downloader
 
-    def fetch_bill_list
-      bills_response = agent.get(
-        "https://myaccount.xcelenergy.com/oam/user/getMyBillsAccounts.req" \
-        "?account=#{account_id}"
-      )
-      JSON.parse(bills_response.body)
-    end
-
-    def fetch_pdf_link(date:, bill_number:)
-      js_click_view = agent.get(
-        "https://myaccount.xcelenergy.com/oam/user/showpdf.req?" \
-        "isPopUp=true&stmtDate=#{date}&stmtNum=#{bill_number}"
-      )
-      str1_markerstring = "window.location='"
-      str2_markerstring = "'; "
-      js_click_view.body[/#{str1_markerstring}(.*?)#{str2_markerstring}/m, 1]
-    end
-
-    def download_pdf(pdf_path:)
-      full_path = "https://myaccount.xcelenergy.com#{pdf_path}"
-      downloader.new(pdf_url: full_path, agent: agent).call
+    def pdf_path
+      # need to pause before navigating again
+      browser.h2(text: "Bill Summary").wait_until(&:present?)
+      browser.goto("https://myaccount.xcelenergy.com/oam/user/currentebill.req")
+      browser.table(data_ui: "billHistoryTable").tr(class: "bill-history-row").td(class: "buttonContainerUpd").a.attribute("href")
     end
   end
 end
