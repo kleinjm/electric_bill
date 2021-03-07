@@ -26,19 +26,14 @@ class RunWorkflow
   def call
     login_to_xcel
     bill_text = download_latest_bill
-    start_date, end_date = parse_bill_date_range(bill_text: bill_text)
-    kwh_cost = compute_kwh_cost(bill_text: bill_text)
+    bill = parse_bill(bill_text: bill_text)
 
-    [main_sense_email, basement_sense_email].each do |email|
-      login_to_sense(email: email)
-      response_body = download_sense_usage(start_date: start_date, end_date: end_date)
-      total_kwh = compute_usage(response_body: response_body)
+    calculate_usage(unit: :main, bill: bill)
+    calculate_usage(unit: :basement, bill: bill)
 
-      usage_total = compute_usage_cost(kwh_used: total_kwh, kwh_cost: kwh_cost)
-    end
-
-    # TODO: Cozy flow to bill tenants
+    bill.print
     logger.info("Workflow completed successfully!")
+    # TODO: Cozy flow to bill tenants
   rescue HandledError => e
     logger.error(e.inspect)
   end
@@ -66,17 +61,30 @@ class RunWorkflow
     xcel_client.download_latest_bill
   end
 
-  def parse_bill_date_range(bill_text:)
-    logger.info("Parsing bill date range")
-    ParseBillDateRange.new(bill_text: bill_text).call
+  def parse_bill(bill_text:)
+    logger.info("Parsing bill")
+    BillParser.new(bill_text: bill_text, logger: logger).call
   end
 
-  def compute_kwh_cost(bill_text:)
-    logger.info("Computing kwh cost")
-    kwh_cost = ComputeKwhCost.new(bill_text: bill_text, logger: logger).call
+  def calculate_usage(unit:, bill:)
+    case unit
+    when :main
+      login_to_sense(email: main_sense_email)
+      response_body = download_sense_usage(bill: bill)
+      total_kwh = compute_usage(response_body: response_body)
 
-    logger.info("kWh cost: $#{kwh_cost}")
-    kwh_cost
+      bill.main_electric_cost = compute_usage_cost(
+        kwh_used: total_kwh, kwh_cost: bill.kwh_cost
+      )
+    when :basement
+      login_to_sense(email: basement_sense_email)
+      response_body = download_sense_usage(bill: bill)
+      total_kwh = compute_usage(response_body: response_body)
+
+      bill.basement_electric_cost = compute_usage_cost(
+        kwh_used: total_kwh, kwh_cost: bill.kwh_cost
+      )
+    end
   end
 
   def login_to_sense(email:)
@@ -84,9 +92,9 @@ class RunWorkflow
     sense_client.login(email: email, password: sense_password)
   end
 
-  def download_sense_usage(start_date:, end_date:)
-    logger.info("Downloading Sense usage data from #{start_date} to #{end_date}")
-    sense_client.download_usage(start_date: start_date, end_date: end_date)
+  def download_sense_usage(bill:)
+    logger.info("Downloading Sense usage data from #{bill.start_date} to #{bill.end_date}")
+    sense_client.download_usage(start_date: bill.start_date, end_date: bill.end_date)
   end
 
   def compute_usage(response_body:)
@@ -98,8 +106,6 @@ class RunWorkflow
     logger.info("Computing total usage cost")
     logger.info("kWh used: #{kwh_used}")
     total_cost = (kwh_used * kwh_cost).round(2)
-
-    logger.info("Total cost: #{total_cost}")
     total_cost
   end
 end
