@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
+require "pdf-reader"
+
 class BillParser
-  def initialize(bill_text:, logger: nil)
-    @bill_text = bill_text
+  def initialize(bill_path:, logger: nil)
+    @bill_path = bill_path
     @bill = Bill.new
     @logger = logger || Logger.new(STDOUT)
+    @reader = PDF::Reader.new(bill_path)
   end
 
   def call
@@ -15,7 +18,7 @@ class BillParser
 
   private
 
-  attr_reader :bill_text, :bill, :logger
+  attr_reader :bill_path, :bill, :logger, :reader
 
   DATE_FORMAT = "%m/%d/%y"
   ELECTRIC_ROW = Regexp.new(/Electricity Service/)
@@ -25,7 +28,10 @@ class BillParser
   def parse_electric
     logger.info("Parsing bill electric")
 
-    electric_row = bill_text.select { |row| row.match?(ELECTRIC_ROW) }.first
+    electric_row = reader.pages.first.text.split("\n").select do |row|
+      row.match?(ELECTRIC_ROW)
+    end.first
+
     words = electric_row.split(" ")
 
     bill.start_date = Date.strptime(words[2], DATE_FORMAT)
@@ -38,7 +44,10 @@ class BillParser
   def parse_gas
     logger.info("Parsing bill gas")
 
-    gas_row = bill_text.select { |row| row.match?(GAS_ROW) }.first
+    gas_row = reader.pages.first.text.split("\n").select do |row|
+      row.match?(GAS_ROW)
+    end.first
+
     words = gas_row.split(" ")
 
     bill.total_gas_cost = words.last.gsub("$", "").to_f

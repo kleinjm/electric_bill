@@ -24,9 +24,10 @@ class RunWorkflow
   end
 
   def call
-    login_to_xcel
-    bill_text = download_latest_bill
-    bill = parse_bill(bill_text: bill_text)
+    download_latest_bill
+
+    bill_path = Rails.root.join("tmp", "latest_bill.pdf")
+    bill = parse_bill(bill_path: bill_path)
 
     calculate_usage(unit: :main, bill: bill)
     calculate_usage(unit: :basement, bill: bill)
@@ -57,13 +58,14 @@ class RunWorkflow
   end
 
   def download_latest_bill
+    login_to_xcel
     logger.info("Downloading latest Xcel bill")
     xcel_client.download_latest_bill
   end
 
-  def parse_bill(bill_text:)
+  def parse_bill(bill_path:)
     logger.info("Parsing bill")
-    BillParser.new(bill_text: bill_text, logger: logger).call
+    BillParser.new(bill_path: bill_path, logger: logger).call
   end
 
   def calculate_usage(unit:, bill:)
