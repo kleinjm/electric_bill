@@ -33,6 +33,7 @@ class RunWorkflow
     calculate_usage(unit: :basement, bill: bill)
 
     bill.print
+    `open https://home.cozy.co/app/#!/properties/`
     logger.info("Workflow completed successfully!")
     # TODO: Cozy flow to bill tenants
   rescue HandledError => e
