@@ -33,10 +33,9 @@ class RunWorkflow
     calculate_usage(unit: :basement, bill: bill)
 
     bill.print
-    `open https://home.cozy.co/app/#!/leases/654059/request-payment`
-    `open https://home.cozy.co/app/#!/leases/715433/request-payment`
+    `open https://www.apartments.com/customers/payments?residentLeaseKey=td768nb`
+    `open https://www.apartments.com/customers/payments?residentLeaseKey=03rwzp0`
     logger.info("Workflow completed successfully!")
-    # TODO: Cozy flow to bill tenants
   rescue HandledError => e
     logger.error(e.inspect)
   end
