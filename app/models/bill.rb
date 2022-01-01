@@ -20,10 +20,11 @@ class Bill
       "Total Electric Cost: $#{total_electric_cost}",
       "Total Gas Cost: $#{total_gas_cost}",
       "Upper Electric Cost: $#{upper_electric_cost}",
-      "Main Electric Cost: $#{main_electric_cost}",
-      "Basement Electric Cost: $#{basement_electric_cost}",
       "Split Upper Electric Cost: $#{split_upper_electric_cost}",
       "Split Gas Cost: $#{split_gas_cost}",
+      "",
+      "Main Electric Cost: $#{main_electric_cost}",
+      "Basement Electric Cost: $#{basement_electric_cost}",
       "Split Upper Gas and Electric Cost: $#{split_upper_gas_and_electric_cost}"
     ].each { |line| puts line }
   end
