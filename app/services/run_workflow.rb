@@ -24,7 +24,10 @@ class RunWorkflow
   end
 
   def call
-    download_latest_bill
+    # TODO: fix scraping
+    # download_latest_bill
+    system("open https://my.xcelenergy.com/MyAccount/XE_Login?template=XE_MA_Template")
+    gets.chomp
 
     bill_path = Rails.root.join("tmp", "latest_bill.pdf")
     bill = parse_bill(bill_path: bill_path)
