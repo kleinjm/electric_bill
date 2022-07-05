@@ -39,6 +39,7 @@ class RunWorkflow
     `open https://www.apartments.com/customers/payments?residentLeaseKey=td768nb`
     `open https://www.apartments.com/customers/payments?residentLeaseKey=03rwzp0`
     logger.info("Workflow completed successfully!")
+    exit
   rescue HandledError => e
     logger.error(e.inspect)
   end
